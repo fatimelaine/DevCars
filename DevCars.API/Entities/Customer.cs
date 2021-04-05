@@ -22,5 +22,10 @@ namespace DevCars.API.Entities
         public string Document { get; private set; }
         public DateTime BirthDate { get; private set; }
         public List<Order> Orders { get; private set; }
+
+        public void Purchase(Order order)
+        {
+            Orders.Add(order);
+        }
     }
 }

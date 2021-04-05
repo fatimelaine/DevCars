@@ -1,4 +1,5 @@
-﻿using DevCars.API.InputModels;
+﻿using DevCars.API.Entities;
+using DevCars.API.InputModels;
 using DevCars.API.Persistence;
 using DevCars.API.ViewModels;
 using Microsoft.AspNetCore.Mvc;
@@ -36,28 +37,69 @@ namespace DevCars.API.Controllers
         [HttpGet("{id}")]
         public IActionResult GetById(int id)
         {
-            return Ok();
+            var car = _dbContext.Cars.SingleOrDefault(c => c.Id == id);
+
+            if(car == null)
+            {
+                return NotFound();
+            }
+
+            var carDetailsViewModel = new CarDetailsViewModel(car.Id, car.Brand, car.Model, car.Color, car.VinCode, car.Year, car.Price, car.ProductionDate);
+
+            return Ok(carDetailsViewModel);
         }
 
         // POST api/cars
         [HttpPost]
         public IActionResult Post([FromBody] AddCarInputModel model)
         {
-            return Ok();
+            if (model.Model.Length > 50)
+            {
+                return BadRequest("Modelo não pode ter mais de 50 caracteres.");
+            }
+
+            var car = new Car(4, model.VinCode, model.Brand, model.Model, model.Year, model.Price, model.Color, model.ProductionDate);
+
+            _dbContext.Cars.Add(car);
+
+            return CreatedAtAction(nameof(GetById), new { id = car.Id }, model);
         }
 
         // PUT api/cars/1
         [HttpPut("{id}")]
         public IActionResult Put(int id, [FromBody] UpdateCarInputModel model)
         {
-            return Ok();
+            if (model.Price < 0)
+            {
+                return BadRequest("Este é um valor inválido.");
+            }
+
+            var car = _dbContext.Cars.SingleOrDefault(c => c.Id == id);
+
+            if (car == null)
+            {
+                return NotFound();
+            }
+
+            car.Update(model.Color, model.Price);
+
+            return NoContent();
         }
 
         // DELETE api/cars/1
         [HttpDelete ("{id}")]
         public IActionResult Delete(int id)
         {
-            return Ok();
+            var car = _dbContext.Cars.SingleOrDefault(c => c.Id == id);
+
+            if (car == null)
+            {
+                return NotFound();
+            }
+
+            car.SetAsSuspended();
+
+            return NoContent();
         }
 
 
