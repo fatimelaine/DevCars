@@ -1,9 +1,6 @@
 ﻿using DevCars.API.Entities;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using System.Reflection;
 
 namespace DevCars.API.Persistence
 {
@@ -21,50 +18,12 @@ namespace DevCars.API.Persistence
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<Car>()
-                .HasKey(c => c.Id);
+            modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
 
-            modelBuilder.Entity<Car>()
-                .Property(c => c.Brand)
-                .HasDefaultValueSql("getdate()");
-
-            modelBuilder.Entity<Car>()
-                .Property(c => c.Brand)
-                .IsRequired()
-                .HasColumnName("Marca")
-                .HasColumnType("VARCHAR(30)")
-                .HasDefaultValue("PADRÃO")
-                .HasMaxLength(30);
-
-            //modelBuilder.Entity<Car>()
-            //    .ToTable("db_Car");
-
-            modelBuilder.Entity<Customer>()
-                .HasKey(c => c.Id);
-
-            modelBuilder.Entity<Customer>()
-                .HasMany(c => c.Orders)
-                .WithOne(o => o.Customer) // propriedade de navegação
-                .HasForeignKey(o => o.CustomerId)
-                .OnDelete(DeleteBehavior.Restrict);
-
-            modelBuilder.Entity<Order>()
-                .HasKey(o => o.Id);
-
-            modelBuilder.Entity<Order>()
-                .HasMany(o => o.ExtraItems)
-                .WithOne()
-                .HasForeignKey(e => e.OrderId)
-                .OnDelete(DeleteBehavior.Restrict);
-
-            modelBuilder.Entity<Order>()
-                .HasOne(o => o.Car)
-                .WithOne()
-                .HasForeignKey<Order>(o => o.CarId)
-                .OnDelete(DeleteBehavior.Restrict);
-
-            modelBuilder.Entity<ExtraOrderItem>()
-                .HasKey(e => e.Id);
+            // modelBuilder.ApplyConfiguration(new CarDbConfiguration());
+            // modelBuilder.ApplyConfiguration(new CustomerDbConfiguration());
+            // modelBuilder.ApplyConfiguration(new OrderDbConfiguration());
+            // modelBuilder.ApplyConfiguration(new ExtraOrderItemDbConfiguration());
         }
     }
 }

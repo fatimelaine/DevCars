@@ -31,6 +31,7 @@ namespace DevCars.API
             var connectionString = Configuration.GetConnectionString("DevCarsCs");
 
             services.AddDbContext<DevCarsDbContext>(options => options.UseSqlServer(connectionString)); 
+            // services.AddDbContext<DevCarsDbContext>(options => options.UseInMemoryDatabase("DevCars")); 
 
             services.AddControllers();
             services.AddSwaggerGen(c =>

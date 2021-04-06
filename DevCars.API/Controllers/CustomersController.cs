@@ -45,17 +45,15 @@ namespace DevCars.API.Controllers
 
             var order = new Order(model.CarId, model.CustomerId, car.Price, extraItems);
 
-            var customer = _dbContext.Customers.SingleOrDefault(c => c.Id == model.CustomerId);
-
             _dbContext.Orders.Add(order);
             _dbContext.SaveChanges();
 
-            return CreatedAtAction(nameof(GetOrder), new { id = order.CustomerId, orderId = order.Id }, model);
+            return CreatedAtAction(nameof(GetOrder), new {orderId = order.Id }, model);
         }
 
-        // GET api/customers/1/orders/2
-        [HttpGet("{id}/orders/{orderId}")]
-        public IActionResult GetOrder(int id, int orderId)
+        // GET api/customers/orders/4
+        [HttpGet("orders/{orderId}")]
+        public IActionResult GetOrder(int orderId)
         {
             var order = _dbContext.Orders
                 .Include(o => o.ExtraItems)
