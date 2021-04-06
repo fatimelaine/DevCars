@@ -1,8 +1,11 @@
-﻿using DevCars.API.Entities;
+﻿using Dapper;
+using DevCars.API.Entities;
 using DevCars.API.InputModels;
 using DevCars.API.Persistence;
 using DevCars.API.ViewModels;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Data.SqlClient;
+using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,24 +17,35 @@ namespace DevCars.API.Controllers
     public class CarsController : ControllerBase
     {
         private readonly DevCarsDbContext _dbContext;
+        private readonly string _connectionString;
 
-        public CarsController(DevCarsDbContext dbContext)
+        public CarsController(DevCarsDbContext dbContext, IConfiguration configuration)
         {
             _dbContext = dbContext;
+
+
+            _connectionString = configuration.GetConnectionString("DevCarsCs");
         }
 
         // GET api/cars
         [HttpGet]
         public IActionResult Get()
         {
-            var cars = _dbContext.Cars;
+            //var cars = _dbContext.Cars;
 
-            var carsViewModel = cars
-                .Where(c => c.Status == CarStatusEnum.Available)
-                .Select(c => new CarItemViewModel(c.Id, c.Brand, c.Model, c.Price))
-                .ToList();
+            //var carsViewModel = cars
+            //    .Where(c => c.Status == CarStatusEnum.Available)
+            //    .Select(c => new CarItemViewModel(c.Id, c.Brand, c.Model, c.Price))
+            //    .ToList();
 
-            return Ok(carsViewModel);
+            using (var sqlConnection = new SqlConnection(_connectionString))
+            {
+                var query = "SELECT Id, Brand, Model, Price FROM Cars Where Status = 0";
+
+                var carsViewModel = sqlConnection.Query<CarItemViewModel>(query); 
+
+                return Ok(carsViewModel);
+            }
         }
 
         // GET api/cars/1
@@ -84,9 +98,16 @@ namespace DevCars.API.Controllers
             }
 
             car.Update(model.Color, model.Price);
-            _dbContext.SaveChanges();
+            // _dbContext.SaveChanges();
 
-            return NoContent();
+            using (var sqlConnection = new SqlConnection(_connectionString))
+            {
+                var query = "UPDATE Cars SET Color = @color, Price = @price WHERE Id = @id";
+
+                sqlConnection.Execute(query, new { color = car.Color, price = car.Price, car.Id });
+            }
+
+                return NoContent();
         }
 
         // DELETE api/cars/1
