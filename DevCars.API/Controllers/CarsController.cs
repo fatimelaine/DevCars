@@ -3,6 +3,7 @@ using DevCars.API.Entities;
 using DevCars.API.InputModels;
 using DevCars.API.Persistence;
 using DevCars.API.ViewModels;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
@@ -65,7 +66,27 @@ namespace DevCars.API.Controllers
         }
 
         // POST api/cars
+        /// <summary>
+        /// Cadastrar um Carro
+        /// </summary>
+        /// <remarks>
+        /// Requisição de exemplo:
+        /// {
+        ///     "brand": "Honda",
+        ///     "model": "Civic",
+        ///     "vinCode": "abc123",
+        ///     "year": 2021,
+        ///     "color": "Cinza",
+        ///     "productionDate": "2021-04-05"
+        /// }
+        /// </remarks>
+        /// <param name="model">Dados de entrada de um novo carro</param>
+        /// <returns>Objeto recém-criado</returns>
+        /// <reponse code="201">Objeto criado com sucesso.</reponse>
+        /// <reponse code="400">Dados inválidos.</reponse>
         [HttpPost]
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public IActionResult Post([FromBody] AddCarInputModel model)
         {
             if (model.Model.Length > 50)
@@ -82,7 +103,26 @@ namespace DevCars.API.Controllers
         }
 
         // PUT api/cars/1
+        /// <summary>
+        /// Atualizar dados de um Carro
+        /// </summary>
+        /// <remarks>
+        /// Requisição de exemplo:
+        /// {
+        ///     "color": "Branco",
+        ///     "price": 100000
+        /// }
+        /// </remarks>
+        /// <param name="id">Identificador de um Carro</param>
+        /// <param name="model">Dados de alteração</param>
+        /// <returns>Não tem retorno.</returns>
+        /// <response code="204">Atualização bem-sucedida</response>
+        /// <response code="400">Dados inválidos</response>
+        /// <response code="404">Carro não encontrado</response>
         [HttpPut("{id}")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public IActionResult Put(int id, [FromBody] UpdateCarInputModel model)
         {
             if (model.Price < 0)
