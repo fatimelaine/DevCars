@@ -32,8 +32,8 @@ namespace DevCars.API
         {
             var connectionString = Configuration.GetConnectionString("DevCarsCs");
 
-            services.AddDbContext<DevCarsDbContext>(options => options.UseSqlServer(connectionString)); 
-            // services.AddDbContext<DevCarsDbContext>(options => options.UseInMemoryDatabase("DevCars")); 
+            // services.AddDbContext<DevCarsDbContext>(options => options.UseSqlServer(connectionString)); 
+            services.AddDbContext<DevCarsDbContext>(options => options.UseInMemoryDatabase("DevCars")); 
 
             services.AddControllers();
             services.AddSwaggerGen(c =>
@@ -58,12 +58,12 @@ namespace DevCars.API
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-            if (env.IsDevelopment())
-            {
+            //if (env.IsDevelopment())
+            //{
                 app.UseDeveloperExceptionPage();
                 app.UseSwagger();
                 app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "DevCars.API v1"));
-            }
+            //}
 
             app.UseHttpsRedirection();
 

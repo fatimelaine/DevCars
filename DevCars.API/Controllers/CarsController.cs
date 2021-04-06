@@ -32,21 +32,23 @@ namespace DevCars.API.Controllers
         [HttpGet]
         public IActionResult Get()
         {
-            //var cars = _dbContext.Cars;
+            var cars = _dbContext.Cars;
 
-            //var carsViewModel = cars
-            //    .Where(c => c.Status == CarStatusEnum.Available)
-            //    .Select(c => new CarItemViewModel(c.Id, c.Brand, c.Model, c.Price))
-            //    .ToList();
+            var carsViewModel = cars
+                .Where(c => c.Status == CarStatusEnum.Available)
+                .Select(c => new CarItemViewModel(c.Id, c.Brand, c.Model, c.Price))
+                .ToList();
 
-            using (var sqlConnection = new SqlConnection(_connectionString))
-            {
-                var query = "SELECT Id, Brand, Model, Price FROM Cars Where Status = 0";
+            return Ok(carsViewModel);
 
-                var carsViewModel = sqlConnection.Query<CarItemViewModel>(query); 
+            //using (var sqlConnection = new SqlConnection(_connectionString))
+            //{
+            //    var query = "SELECT Id, Brand, Model, Price FROM Cars Where Status = 0";
 
-                return Ok(carsViewModel);
-            }
+            //    var carsViewModel = sqlConnection.Query<CarItemViewModel>(query); 
+
+            //    return Ok(carsViewModel);
+            //}
         }
 
         // GET api/cars/1
@@ -76,6 +78,7 @@ namespace DevCars.API.Controllers
         ///     "model": "Civic",
         ///     "vinCode": "abc123",
         ///     "year": 2021,
+        ///     "price": 100000,
         ///     "color": "Cinza",
         ///     "productionDate": "2021-04-05"
         /// }
@@ -138,14 +141,14 @@ namespace DevCars.API.Controllers
             }
 
             car.Update(model.Color, model.Price);
-            // _dbContext.SaveChanges();
+            _dbContext.SaveChanges();
 
-            using (var sqlConnection = new SqlConnection(_connectionString))
-            {
-                var query = "UPDATE Cars SET Color = @color, Price = @price WHERE Id = @id";
+            //using (var sqlConnection = new SqlConnection(_connectionString))
+            //{
+            //    var query = "UPDATE Cars SET Color = @color, Price = @price WHERE Id = @id";
 
-                sqlConnection.Execute(query, new { color = car.Color, price = car.Price, car.Id });
-            }
+            //    sqlConnection.Execute(query, new { color = car.Color, price = car.Price, car.Id });
+            //}
 
                 return NoContent();
         }
